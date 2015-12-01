@@ -1,0 +1,6 @@
+jinja2
+python-consul
+supervisor
+distribute >= 0.7.3
+
+git+https://github.com/nikitinsm/python-dict-tools.git
