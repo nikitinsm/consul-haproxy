@@ -7,25 +7,21 @@ global
 {#-    #daemon#}
 
 defaults
-    log                 global
-    mode                http
-    option              httplog
-    option              dontlognull
-    option              forwardfor
-    option              http-server-close
-    timeout connect     5000ms
-    timeout client      50000ms
-    timeout server      50000ms
+    log     global
+    mode    http
+    timeout connect 5000
+    timeout client 50000
+    timeout server 50000
 
-{%- if haproxy.stats_enable %}
+{#{%- if haproxy.stats_enable %}#}
     {#- TODO: more generic setup #}
-    stats               enable
-    stats               auth {{ haproxy.stats_user }}:{{ haproxy.stats_password }}
-    stats               uri /stats
-{%- endif %}
+{#    stats               enable#}
+{#    stats               auth test:test#}
+{#    stats               uri /stats#}
+{#{%- endif %}#}
 
 frontend http
-    bind *:80
+    bind 0.0.0.0:80
 {%- for service in services %}
     {% set name=service.ServiceName | replace('-', '_') %}
     # AUTO: {{ service.ServiceName }} frontend
@@ -36,8 +32,5 @@ frontend http
     {% set name=service.ServiceName | replace('-', '_') %}
 # AUTO: {{ service.ServiceName }} backend
 backend backend_{{ name }}
-    balance leastconn
-    option httpclose
-    option forwardfor
     server {{ service.Node }} {{ service.ServiceAddress }}:{{ service.Port | default(service.ServicePort) }} cookie A check
 {% endfor %}

@@ -7,8 +7,10 @@ import argparse
 import consul
 import dict_tools
 
+from subprocess import call
 from jinja2.environment import Environment
 from jinja2.loaders import FileSystemLoader
+
 
 
 HAPROXY_TEMPLATE = os.environ.get('HAPROXY_TEMPLATE') or '/etc/haproxy/haproxy.conf.j2'
@@ -107,18 +109,18 @@ def update_haproxy(args, client, services):
     template = jinja_env.get_template(args.haproxy_template)
     result = template.render(context)
 
-    print json.dumps(context, ensure_ascii=False, indent=2)
-    print ''
-    print '----'
-    print ''
-
-    print result
+    # print json.dumps(context, ensure_ascii=False, indent=2)
+    # print ''
+    # print '----'
+    # print ''
+    #
+    # print result
 
     handler = open(args.haproxy_config, mode='w')
     handler.write(result)
     handler.close()
 
-    # @todo: reload haproxy
+    call(["/etc/haproxy/reload.sh"])
 
 
 def main():
