@@ -9,7 +9,7 @@ COPY ./requirements.pip /srv/requirements.pip
 RUN pip install -r /srv/requirements.pip
 
 # Prepare FS
-ENV APP_NAME="/emias/haproxy"
+ENV APP_NAME="/haproxy"
 ENV APP_ROOT="/opt${APP_NAME}"
 ENV APP_REPOSITORY="${APP_ROOT}/repository"
 
