@@ -24,13 +24,17 @@ frontend http
     bind 0.0.0.0:80
 {%- for service in services %}
     {% set name=service.ServiceName | replace('-', '_') %}
+    {%- if 'haproxy' not in name %}
     # AUTO: {{ service.ServiceName }} frontend
     acl host_{{ name }} hdr(host) -i {{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
     use_backend backend_{{ name }} if host_{{ name }}
+    {%- endif %}
 {%- endfor %}
 {%- for service in services %}
     {% set name=service.ServiceName | replace('-', '_') %}
+    {%- if 'haproxy' not in name %}
 # AUTO: {{ service.ServiceName }} backend
 backend backend_{{ name }}
     server {{ service.Node }} {{ service.ServiceAddress }}:{{ service.Port | default(service.ServicePort) }} cookie A check
+    {% endif %}
 {% endfor %}
