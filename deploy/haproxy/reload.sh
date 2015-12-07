@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 iptables -I INPUT -p tcp --dport 80 --syn -j DROP
 sleep 1
-supervisorctl -u login -p pass restart haproxy
+supervisorctl restart haproxy
 iptables -D INPUT -p tcp --dport 80 --syn -j DROP
