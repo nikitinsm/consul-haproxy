@@ -1,16 +1,23 @@
 #!/usr/bin/python
-import json
 import os
 import socket
 import sys
 import argparse
+
 import consul
 import dict_tools
+import ansible
 
 from subprocess import call
+from distutils.version import LooseVersion
 from jinja2.environment import Environment
 from jinja2.loaders import FileSystemLoader
 
+# Import filters
+if LooseVersion(ansible.__version__) < "2.0.0":
+    from ansible.runner.filter_plugins.core import FilterModule
+else:
+    from ansible.plugins.filter.core import FilterModule
 
 
 HAPROXY_TEMPLATE = os.environ.get('HAPROXY_TEMPLATE') or '/etc/haproxy/haproxy.conf.j2'
@@ -20,6 +27,7 @@ CONSUL_PORT = int(os.environ.get('CONSUL_PORT') or 8500)
 
 
 jinja_env = Environment(loader=FileSystemLoader('/'))
+jinja_env.filters.update(FilterModule().filters())
 
 
 parser = argparse.ArgumentParser\

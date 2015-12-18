@@ -1,8 +1,8 @@
 FROM haproxy:1.6
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y python-pip iptables git && \
-    pip install -U pip
+RUN apt-get install -y python-pip python-dev python-setuptools iptables git && \
+    pip install -U pip distribute
 
 # Prepare python
 COPY ./requirements.pip /srv/requirements.pip

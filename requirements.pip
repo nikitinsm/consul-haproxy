@@ -1,6 +1,8 @@
+ansible
+distribute >= 0.7.3
 jinja2
 python-consul
+pyyaml
 supervisor
-distribute >= 0.7.3
 
 git+https://github.com/nikitinsm/python-dict-tools.git
