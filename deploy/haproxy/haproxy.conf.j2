@@ -24,7 +24,7 @@ frontend http
     bind 0.0.0.0:80
 {%- for service in services %}
   {%- set name=service.ServiceName | replace('-', '_') %}
-  {%- if service.HaproxyCustomFrontend2 %}
+  {%- if service.HaproxyCustomFrontend %}
     # CUSTOM: {{ service.ServiceName }} frontend
     {%- for line in service.HaproxyCustomFrontend2 | from_yaml  %}
     {{ line | trim }}
@@ -39,7 +39,7 @@ frontend http
 {%- endfor %}
 {%- for service in services %}
   {%- set name=service.ServiceName | replace('-', '_') %}
-  {%- if service.HaproxyCustomBackend2 %}
+  {%- if service.HaproxyCustomBackend %}
     {%- for name, lines in (service.HaproxyCustomBackend2 | from_yaml).items() %}
 # CUSTOM: {{ name }} backend
 backend {{ name }}
