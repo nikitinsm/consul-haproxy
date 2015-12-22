@@ -73,15 +73,16 @@ parser.add_argument\
 
 def consul_kv_to_dict(data):
     result = dict()
-    for item in data:
-        key = item['Key']
-        value = item['Value']
-        result = dict_tools.merge\
-            ( result
-            , dict_tools.expand
-              ( *key.split('/')
-              , value=value
-            ) )
+    if data:
+        for item in data:
+            key = item['Key']
+            value = item['Value']
+            result = dict_tools.merge\
+                ( result
+                , dict_tools.expand
+                  ( *key.split('/')
+                  , value=value
+                ) )
     return result
 
 
