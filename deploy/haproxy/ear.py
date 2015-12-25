@@ -149,7 +149,11 @@ def main():
     while True:
         try:
             index, services = client.catalog.services(index)
-            update_haproxy(args, client, services)
+            try:
+                update_haproxy(args, client, services)
+            except Exception as e:
+                if os.environ.get('DEBUG'):
+                    raise e
         except KeyboardInterrupt:
             sys.exit()
 
