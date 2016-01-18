@@ -1,10 +1,5 @@
 global
-{#-    log 127.0.0.1   local0#}
-{#-    log 127.0.0.1   local1 notice#}
     maxconn             4096
-{#-    user                haproxy#}
-{#-    group               haproxy#}
-{#-    #daemon#}
 
 defaults
     log     global
@@ -13,12 +8,16 @@ defaults
     timeout client 50000
     timeout server 50000
 
-{#{%- if haproxy.stats_enable %}#}
-    {#- TODO: more generic setup #}
-{#    stats               enable#}
-{#    stats               auth test:test#}
-{#    stats               uri /stats#}
-{#{%- endif %}#}
+{% if env.HAPROXY_ADMIN_HOST %}
+listen stats
+    bind {{ env.HAPROXY_ADMIN_HOST }}:{{ env.HAPROXY_ADMIN_PORT | default(9000) }}
+
+    stats uri /
+    stats realm HAProxy\ Statistics
+    stats auth {{ env.HAPROXY_ADMIN_LOGIN | default('haproxy') }}:{{ env.HAPROXY_ADMIN_PASSWORD | default('admin') }}
+    stats admin if TRUE
+{% endif %}
+
 
 frontend http
     bind 0.0.0.0:80
@@ -28,7 +27,7 @@ frontend http
     # CUSTOM: {{ service.ServiceName }} frontend
     {%- for line in service.HaproxyCustomFrontend | from_yaml  %}
     {{ line | trim }}
-    {%- endfor %}
+    {% endfor %}
   {%- elif service.Auto | default(True) %}
     {%- if 'haproxy' not in name %}
     # AUTO: {{ service.ServiceName }} frontend

@@ -92,6 +92,7 @@ def update_haproxy(args, client, services):
     context = \
         { 'haproxy': {}
         , 'services': []
+        , 'env': dict(os.environ)
         }
 
     for service_id, tags in services.iteritems():
