@@ -126,9 +126,12 @@ def update_haproxy(args, client, services):
     #
     # print result
 
-    handler = open(args.haproxy_config, mode='r')
-    old_config = handler.read()
-    handler.close()
+    try:
+        handler = open(args.haproxy_config, mode='r')
+        old_config = handler.read()
+        handler.close()
+    except Exception as e:
+        old_config = ''
 
     if old_config != result:
         handler = open(args.haproxy_config, mode='w')
