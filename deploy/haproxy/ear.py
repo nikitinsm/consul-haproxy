@@ -13,7 +13,7 @@ from distutils.version import LooseVersion
 from jinja2.environment import Environment
 from jinja2.loaders import FileSystemLoader
 
-# Import filters
+# Import ansible filters
 if LooseVersion(ansible.__version__) < "2.0.0":
     from ansible.runner.filter_plugins.core import FilterModule
 else:
@@ -126,11 +126,15 @@ def update_haproxy(args, client, services):
     #
     # print result
 
-    handler = open(args.haproxy_config, mode='w')
-    handler.write(result)
+    handler = open(args.haproxy_config, mode='r')
+    old_config = handler.read()
     handler.close()
 
-    call(["/etc/haproxy/reload.sh"])
+    if old_config != result:
+        handler = open(args.haproxy_config, mode='w')
+        handler.write(result)
+        handler.close()
+        call(["/etc/haproxy/reload.sh"])
 
 
 def main():
