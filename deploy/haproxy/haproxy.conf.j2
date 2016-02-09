@@ -32,6 +32,7 @@ frontend http
     {%- if 'haproxy' not in name %}
     # AUTO: {{ service.ServiceName }} frontend
     acl host_{{ name }} hdr(host) -i {{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
+    acl host_{{ name }} hdr(host) -i www.{{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
     use_backend backend_{{ name }} if host_{{ name }}
     {%- endif %}
   {% endif %}
