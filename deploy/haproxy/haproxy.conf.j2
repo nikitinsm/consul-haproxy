@@ -7,6 +7,8 @@ defaults
     timeout connect 5000
     timeout client 50000
     timeout server 50000
+    option http-server-close
+    option forwardfor header X-Real-IP
 
 {% if env.HAPROXY_ADMIN_HOST %}
 listen stats
