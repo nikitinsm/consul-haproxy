@@ -4,9 +4,9 @@ global
 defaults
     log global
     mode http
-    timeout connect 5000ms
-    timeout client 50000ms
-    timeout server 50000ms
+    timeout connect 5s
+    timeout client 120s
+    timeout server 120s
     option http-server-close
     option forwardfor header X-Real-IP
 
@@ -45,6 +45,8 @@ frontend http
     {%- for name, lines in (service.HaproxyCustomBackend | from_yaml).items() %}
 # CUSTOM: {{ name }} backend
 backend {{ name }}
+    timeout client 120s
+    timeout server 120s
       {%- for line in lines  %}
     {{ line | trim }}
       {% endfor %}
@@ -54,6 +56,8 @@ backend {{ name }}
 # AUTO: {{ service.ServiceName }} backend
 backend backend_{{ name }}
     server {{ service.Node }} {{ service.ServiceAddress }}:{{ service.Port | default(service.ServicePort) }} cookie A check
+    timeout client 120s
+    timeout server 120s
     {% endif %}
   {% endif %}
 {% endfor %}
