@@ -1,12 +1,12 @@
 global
     maxconn 4096
 
-defaults:
+defaults
     log global
     mode http
-    timeout connect 5000
-    timeout client 120000
-    timeout server 120000
+    timeout connect 5000ms
+    timeout client 50000ms
+    timeout server 50000ms
     option http-server-close
     option forwardfor header X-Real-IP
 
