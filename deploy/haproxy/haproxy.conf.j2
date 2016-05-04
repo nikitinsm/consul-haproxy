@@ -1,3 +1,22 @@
+{% macro frontend(services) %}
+{%- for service in services %}
+  {%- set name=service.ServiceName | replace('-', '_') %}
+  {%- if service.HaproxyCustomFrontend %}
+    # CUSTOM: {{ service.ServiceName }} frontend
+    {%- for line in service.HaproxyCustomFrontend | from_yaml  %}
+    {{ line | trim }}
+    {% endfor %}
+  {%- elif service.Auto | default(True) %}
+    {%- if 'haproxy' not in name %}
+    # AUTO: {{ service.ServiceName }} frontend
+    acl host_{{ name }} hdr(host) -i {{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
+    acl host_{{ name }} hdr(host) -i www.{{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
+    use_backend backend_{{ name }} if host_{{ name }}
+    {%- endif %}
+  {% endif %}
+{%- endfor %}
+{% endmacro %}
+
 global
     maxconn 4096
 
@@ -20,25 +39,19 @@ listen stats
     stats admin if TRUE
 {% endif %}
 
-
 frontend http
     bind 0.0.0.0:80
-{%- for service in services %}
-  {%- set name=service.ServiceName | replace('-', '_') %}
-  {%- if service.HaproxyCustomFrontend %}
-    # CUSTOM: {{ service.ServiceName }} frontend
-    {%- for line in service.HaproxyCustomFrontend | from_yaml  %}
-    {{ line | trim }}
-    {% endfor %}
-  {%- elif service.Auto | default(True) %}
-    {%- if 'haproxy' not in name %}
-    # AUTO: {{ service.ServiceName }} frontend
-    acl host_{{ name }} hdr(host) -i {{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
-    acl host_{{ name }} hdr(host) -i www.{{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
-    use_backend backend_{{ name }} if host_{{ name }}
-    {%- endif %}
-  {% endif %}
-{%- endfor %}
+    {{ frontend(services) }}
+
+
+{% if env.HAPROXY_SSL_CERTIFICATE %}
+frontend https
+    bind 0.0.0.0:443 ssl crt {{ env.HAPROXY_SSL_CERTIFICATE }}
+    reqadd X-Forwarded-Proto:\ https
+    {{ frontend(services) }}
+{% endif %}
+
+
 {%- for service in services %}
   {%- set name=service.ServiceName | replace('-', '_') %}
   {%- if service.HaproxyCustomBackend %}

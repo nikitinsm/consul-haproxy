@@ -1,7 +1,7 @@
 FROM haproxy:1.6
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y python-pip python-dev python-setuptools iptables git && \
+RUN apt-get install -y python-pip python-dev python-setuptools iptables git libffi-dev libssl-dev && \
     pip install -U pip distribute
 
 # Prepare python
