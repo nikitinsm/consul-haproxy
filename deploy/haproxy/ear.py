@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import json
 import os
 import socket
 import sys
@@ -69,6 +70,12 @@ parser.add_argument\
     , help='Haroxy template file path'
     , default=HAPROXY_TEMPLATE
     )
+parser.add_argument\
+    ( '-d', '--debug'
+    , action='store_true'
+    , help='Print config, do nothing'
+    , default=False
+    )
 
 
 def consul_kv_to_dict(data):
@@ -119,7 +126,11 @@ def update_haproxy(args, client, services):
     template = jinja_env.get_template(args.haproxy_template)
     result = template.render(context)
 
-    # print json.dumps(context, ensure_ascii=False, indent=2)
+    if args.debug:
+        print json.dumps(context, ensure_ascii=False, indent=2)
+        print '\n---\n'
+        print result
+        sys.exit()
     # print ''
     # print '----'
     # print ''
@@ -142,6 +153,8 @@ def update_haproxy(args, client, services):
 
 def main():
     args = parser.parse_args()
+    if args.debug:
+        print json.dumps(args.__dict__, indent=2)
     client = consul.Consul(args.consul_host, args.consul_port)
 
     # Preload haproxy config

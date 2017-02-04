@@ -9,8 +9,11 @@
   {%- elif service.Auto | default(True) %}
     {%- if 'haproxy' not in name %}
     # AUTO: {{ service.ServiceName }} frontend
-    acl host_{{ name }} hdr(host) -i {{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
-    acl host_{{ name }} hdr(host) -i www.{{ service.Domain | default(None) or (service.ServiceName + '.service.consul') }}
+    {%- set domains = (service.Domain | default(None) or (service.ServiceName + '.service.consul')).split(',') %}
+    {%- for domain in domains %}
+    acl host_{{ name }} hdr(host) -i {{ domain | trim }}
+    acl host_{{ name }} hdr(host) -i www.{{ domain | trim }}
+    {% endfor %}
     use_backend backend_{{ name }} if host_{{ name }}
     {%- endif %}
   {% endif %}
