@@ -6,6 +6,7 @@ import sys
 import argparse
 
 import consul
+import datetime
 import dict_tools
 import ansible
 
@@ -170,11 +171,14 @@ def main():
     while True:
         try:
             index, services = client.catalog.services(index)
+            print '[%s] updating: %s' % (datetime.datetime.now(), index)
             try:
                 update_haproxy(args, client, services)
             except Exception as e:
                 if os.environ.get('DEBUG'):
                     raise e
+                else:
+                    print e
         except KeyboardInterrupt:
             sys.exit()
 
